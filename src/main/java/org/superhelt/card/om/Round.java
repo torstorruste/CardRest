@@ -1,6 +1,7 @@
 package org.superhelt.card.om;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Round {
@@ -12,7 +13,7 @@ public class Round {
     public Round(int id, LocalDate date, List<Score> scores) {
         this.id = id;
         this.date = date;
-        this.scores = scores;
+        this.scores = new ArrayList<>(scores);
     }
 
     public int getId() {

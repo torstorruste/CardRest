@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,6 +40,30 @@ public class CsvParser {
         return result;
     }
 
+    public Map<Integer, List<Score>> getScores(List<Player> players) {
+        Map<Integer, List<Score>> result = new HashMap<>();
+
+        try(BufferedReader reader = Files.newBufferedReader(basePath.resolve("Score.csv"))) {
+            handleRows(reader, line->{
+                String[] fields = line.replaceAll("\"", "").split(",");
+                Player player = getPlayerByName(players, fields[0]);
+                int id = Integer.parseInt(fields[1]);
+                List<Integer> scores = new ArrayList<>();
+                for(int i=2;i<9;i++) {
+                    scores.add(Integer.parseInt(fields[i]));
+                }
+
+                Score score = new Score(player, scores);
+
+                result.computeIfAbsent(id, (k)->new ArrayList<>()).add(score);
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to fetch scores", e);
+        }
+
+        return result;
+    }
+
     public List<Round> getRounds(Map<Integer, List<Score>> scores) {
         List<Round> result = new ArrayList<>();
 
@@ -62,5 +87,9 @@ public class CsvParser {
         while((line = reader.readLine()) != null) {
             lineHandler.accept(line);
         }
+    }
+
+    private Player getPlayerByName(List<Player> players, String name) {
+        return players.stream().filter(p->p.getName().equals(name)).findFirst().orElseThrow(()->new RuntimeException("Unknown player: "+name));
     }
 }
