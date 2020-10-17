@@ -19,11 +19,13 @@ public class CsvParser {
 
     public List<Player> getPlayers() {
         List<Player> result = new ArrayList<>();
+        int id = 0;
 
         try(BufferedReader reader = Files.newBufferedReader(basePath.resolve("Players.csv"))) {
             String line;
             while((line = reader.readLine()) != null) {
-
+                String name = line.replaceAll("\"", "");
+                result.add(new Player(id++, name));
             }
         } catch (IOException e) {
             throw new RuntimeException("Unable to fetch players", e);
