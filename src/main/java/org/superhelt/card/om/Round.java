@@ -1,5 +1,10 @@
 package org.superhelt.card.om;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.superhelt.card.serializers.LocalDateDeserializer;
+import org.superhelt.card.serializers.LocalDateSerializer;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +12,8 @@ import java.util.List;
 public class Round {
 
     private final int id;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private final LocalDate date;
     private final List<Score> scores;
 

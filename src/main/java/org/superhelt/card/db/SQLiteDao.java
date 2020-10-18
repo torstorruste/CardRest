@@ -8,6 +8,7 @@ import org.superhelt.card.om.Round;
 import org.superhelt.card.om.Score;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,29 @@ public class SQLiteDao implements AutoCloseable {
         }
 
         return result;
+    }
+
+    public List<Round> getRounds() {
+        List<Round> result = new ArrayList<>();
+
+        try(PreparedStatement st = conn.prepareStatement("select * from round");
+            ResultSet rs = st.executeQuery()) {
+            while(rs.next()) {
+                result.add(mapRound(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to fetch rounds", e);
+        }
+
+        return result;
+    }
+
+    private Round mapRound(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        LocalDate date = LocalDate.parse(rs.getString("date"), df);
+        List<Score> scores = new ArrayList<>();
+
+        return new Round(id, date, scores);
     }
 
     private Player mapPlayer(ResultSet rs) throws SQLException {
