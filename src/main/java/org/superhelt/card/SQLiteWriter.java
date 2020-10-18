@@ -81,8 +81,8 @@ public class SQLiteWriter implements AutoCloseable {
 
     private void createTables() {
         try (Statement st = conn.createStatement()) {
-            st.executeUpdate("create table if not exists player (id integer not null primary key, name text)");
-            st.executeUpdate("create table if not exists round (id integer not null primary key, date text)");
+            st.executeUpdate("create table if not exists player (id integer not null primary key autoincrement, name text)");
+            st.executeUpdate("create table if not exists round (id integer not null primary key autoincrement, date text)");
             st.executeUpdate("create table if not exists score (roundid integer not null, playerid integer not null, " +
                     "r1 integer, r2 integer, r3 integer, r4 integer, r5 integer, r6 integer, r7 integer," +
                     "foreign key (roundid) references round (id), foreign key (playerid) references player (id))");
