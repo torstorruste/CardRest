@@ -25,5 +25,9 @@ public class DatabaseGenerator {
         List<Round> rounds = csvParser.getRounds(scores);
 
         rounds.stream().sorted(Comparator.comparing(Round::getDate)).map(Round::getDate).forEach(System.out::println);
+
+        SQLiteWriter writer = new SQLiteWriter("card.db");
+
+        players.forEach(writer::createPlayer);
     }
 }
