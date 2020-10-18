@@ -9,5 +9,6 @@ public class CardApplication extends ResourceConfig {
     public CardApplication() {
         register(new CardBinder());
         packages("org.superhelt.card");
+        register(CorsFilter.class);
     }
 }
