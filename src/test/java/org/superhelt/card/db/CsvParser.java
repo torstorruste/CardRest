@@ -1,4 +1,4 @@
-package org.superhelt.card;
+package org.superhelt.card.db;
 
 import org.superhelt.card.om.Player;
 import org.superhelt.card.om.Round;
