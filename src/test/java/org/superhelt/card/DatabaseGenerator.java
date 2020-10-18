@@ -1,7 +1,7 @@
 package org.superhelt.card;
 
 import org.superhelt.card.db.CsvParser;
-import org.superhelt.card.db.SQLiteWriter;
+import org.superhelt.card.db.SQLiteDao;
 import org.superhelt.card.om.Player;
 import org.superhelt.card.om.Round;
 import org.superhelt.card.om.Score;
@@ -22,7 +22,7 @@ public class DatabaseGenerator {
 
         List<Round> rounds = csvParser.getRounds(scores);
 
-        SQLiteWriter writer = new SQLiteWriter("card.db");
+        SQLiteDao writer = new SQLiteDao("card.db");
 
         players.forEach(writer::createPlayer);
         rounds.forEach(r-> {

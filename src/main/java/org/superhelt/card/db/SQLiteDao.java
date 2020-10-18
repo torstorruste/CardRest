@@ -1,5 +1,6 @@
 package org.superhelt.card.db;
 
+import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.superhelt.card.om.Player;
@@ -8,21 +9,47 @@ import org.superhelt.card.om.Score;
 
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
-public class SQLiteWriter implements AutoCloseable {
+@Service
+public class SQLiteDao implements AutoCloseable {
 
-    private static final Logger log = LoggerFactory.getLogger(SQLiteWriter.class);
+    private static final Logger log = LoggerFactory.getLogger(SQLiteDao.class);
     private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final Connection conn;
 
-    public SQLiteWriter(String databaseName) {
+    public SQLiteDao(String databaseName) {
         try {
-            conn = DriverManager.getConnection("jdbc:sqlite:card.db");
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:"+databaseName);
             createTables();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Unable to connect to database " + databaseName, e);
         }
+    }
+
+    public List<Player> getPlayers() {
+        List<Player> result = new ArrayList<>();
+
+        try(PreparedStatement st = conn.prepareStatement("select * from player");
+            ResultSet rs = st.executeQuery()) {
+            while(rs.next()) {
+                result.add(mapPlayer(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to fetch players", e);
+        }
+
+        return result;
+    }
+
+    private Player mapPlayer(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+
+        return new Player(id, name);
     }
 
     public void createPlayer(Player player) {
