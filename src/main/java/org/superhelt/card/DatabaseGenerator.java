@@ -18,16 +18,16 @@ public class DatabaseGenerator {
         CsvParser csvParser = new CsvParser(basePath);
         List<Player> players = csvParser.getPlayers();
 
-        players.stream().map(Player::getName).forEach(System.out::println);
-
         Map<Integer, List<Score>> scores = csvParser.getScores(players);
 
         List<Round> rounds = csvParser.getRounds(scores);
 
-        rounds.stream().sorted(Comparator.comparing(Round::getDate)).map(Round::getDate).forEach(System.out::println);
-
         SQLiteWriter writer = new SQLiteWriter("card.db");
 
         players.forEach(writer::createPlayer);
+        rounds.forEach(r-> {
+            writer.createRound(r);
+            r.getScores().forEach(s->writer.createScore(r, s));
+        });
     }
 }
