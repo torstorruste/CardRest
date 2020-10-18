@@ -14,7 +14,7 @@ import java.util.Map;
 public class DatabaseGenerator {
 
     public static void main(String[] args) throws Exception {
-        Path basePath = Paths.get("C:\\projects\\CardRest\\src\\main\\resources");
+        Path basePath = Paths.get("src\\test\\resources");
         CsvParser csvParser = new CsvParser(basePath);
         List<Player> players = csvParser.getPlayers();
 
