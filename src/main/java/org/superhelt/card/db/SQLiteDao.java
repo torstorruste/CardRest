@@ -48,11 +48,12 @@ public class SQLiteDao implements AutoCloseable {
 
     public List<Round> getRounds() {
         List<Round> result = new ArrayList<>();
+        List<Player> players = getPlayers();
 
         try(PreparedStatement st = conn.prepareStatement("select * from round");
             ResultSet rs = st.executeQuery()) {
             while(rs.next()) {
-                result.add(mapRound(rs));
+                result.add(mapRound(players, rs));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Unable to fetch rounds", e);
@@ -61,12 +62,39 @@ public class SQLiteDao implements AutoCloseable {
         return result;
     }
 
-    private Round mapRound(ResultSet rs) throws SQLException {
+    private Round mapRound(List<Player> players, ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         LocalDate date = LocalDate.parse(rs.getString("date"), df);
-        List<Score> scores = new ArrayList<>();
+        List<Score> scores = getScores(players, id);
 
         return new Round(id, date, scores);
+    }
+
+    private List<Score> getScores(List<Player> players, int roundId) throws SQLException {
+        List<Score> result = new ArrayList<>();
+
+        try (PreparedStatement st = conn.prepareStatement("select * from score where roundid=?")) {
+            st.setInt(1, roundId);
+
+            try(ResultSet rs = st.executeQuery()) {
+                while(rs.next()) {
+                    result.add(mapScore(players, rs));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private Score mapScore(List<Player> players, ResultSet rs) throws SQLException {
+        int playerId = rs.getInt("playerid");
+        Player player = players.stream().filter(p->p.getId()==playerId).findFirst().orElseThrow(()->new IllegalArgumentException("Unknown player with id "+playerId));
+        List<Integer> scores = new ArrayList<>();
+        for(int i=1;i<=7; i++) {
+            scores.add(rs.getInt("r"+i));
+        }
+
+        return new Score(player, scores);
     }
 
     private Player mapPlayer(ResultSet rs) throws SQLException {
